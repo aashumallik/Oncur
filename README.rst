@@ -1,4 +1,4 @@
-medico
+Oncur
 ======
 
 consultation platform
