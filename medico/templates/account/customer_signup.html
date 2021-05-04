@@ -1,0 +1,8 @@
+{% extends "account/signup.html" %}
+
+{% block signup_links %}
+    {{ block.super }}
+    <p>Are you a healthcare professional? Head to <a href="{% url 'users:medical-signup' %}">healthcare professional registration</a>.</p>
+{% endblock signup_links %}
+
+{% block form_action %}{% url 'users:customer-signup' %}{% endblock form_action %}

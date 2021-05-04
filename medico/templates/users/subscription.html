@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script src="https://js.stripe.com/v3/"></script>
+
+{% endblock javascript %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <h2>Manage Subscription</h2>
+            {% if not subscription %}
+                <p>You have no active subscriptions.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% if subscription %}
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Started At:</h5>
+                    </div>
+                    <div class="col-6">
+                        <h5>{{ subscription.started_at }}</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Ending At:</h5>
+                    </div>
+                    <div class="col-6">
+                        <h5>{{ subscription.ends_at }}</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Price:</h5>
+                    </div>
+                    <div class="col-6">
+                        <h5>{{ subscription.human_readable_price }}</h5>
+                    </div>
+                </div>
+                <button id="cancel-sub" class="btn btn-primary" data-toggle="modal" data-target="#sub-cancel-modal">Cancel subscription</button>
+            </div>
+        </div>
+        <div class="row payment-row">
+            <div class="col-sm-12">
+                <h2>Payment Method Information</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Brand:</h5>
+                    </div>
+                    <div class="col-6">
+                        <h5>{{ card_data.brand|title }}</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Expires:</h5>
+                    </div>
+                    <div class="col-6">
+                        <h5>{{ card_data.exp_month }}/{{ card_data.exp_year }}</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Last Four Digits:</h5>
+                    </div>
+                    <div class="col-6">
+                        <h5>{{ card_data.last4 }}</h5>
+                    </div>
+                </div>
+                <button id="edit-card" class="btn btn-primary" data-toggle="modal" data-target="#edit-card-modal">Modify card details</button>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}
+
+{% block modal %}
+    <div class="modal fade" id="sub-cancel-modal" tabindex="-1" role="dialog" aria-labelledby="sub-cancel-modal-label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sub-cancel-modal-label">Cancel Subscription</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span>Are you sure you want to cancel your subscription?</span>
+                    <span>You will have to pay and subscribe again to avail telehealth consultations on the platform.</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button id="cancel-sub-btn" type="button" class="btn btn-primary">
+                        <div class="spinner-border  spinner-border-sm text-light
+                            hidden" id="spinner" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        Cancel subscription
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="edit-card-modal" tabindex="-1" role="dialog" aria-labelledby="edit-card-modal-label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="edit-card-modal-label">Modify Card Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="card-save-form">
+                    <div class="modal-body">
+                        <div id="card-element" class="MyCardElement">
+                            <!-- Elements will create input elements here -->
+                        </div>
+                        <div id="card-errors" class="card-errors" role="alert"></div>
+                    </div>
+                    <div class="modal-footer">
+                        
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button id="save-card-btn" type="submit" class="btn btn-primary">
+                            <div class="spinner-border  spinner-border-sm text-light
+                                hidden" id="spinner" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            Save card details
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock modal %}
+
+{% block inline_javascript %}
+<script type="text/javascript">
+    // XXX: Maybe commonize some of this code; useful in other files
+    let changeLoadingState = function(isLoading, buttonId, modalLabel) {
+        if (isLoading) {
+            document.getElementById(buttonId).disabled = true;
+            document.querySelector("#spinner").classList.remove("hidden");
+            document.querySelector(modalLabel).classList.add("hidden");
+        } else {
+            document.getElementById(buttonId).disabled = false;
+            document.querySelector("#spinner").classList.add("hidden");
+            document.querySelector(modalLabel).classList.remove("hidden");
+        }
+    };
+
+    let displayError = function(event) {
+        let displayError = document.getElementById('card-errors');
+        if (event.error) {
+            if (event.error.type === 'FormError') {
+                displayError.textContent = event.error.messages.join("\n");
+            } else {
+                displayError.textContent = event.error.message;
+            }
+        } else {
+            displayError.textContent = '';
+        }
+    };
+
+    let stripeElements = function() {
+        stripe = Stripe("{{ STRIPE_PUBLISHABLE_KEY }}");
+        window.stripe = stripe;
+        let elements = stripe.elements();
+
+        if (!document.getElementById('card-element'))
+            return;
+
+        let style = {
+            base: {
+                color: "#32325d",
+                fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                fontSmoothing: "antialiased",
+                fontSize: "16px",
+                "::placeholder": {
+                    color: "#aab7c4"
+                }
+            },
+            invalid: {
+                color: "#fa755a",
+                iconColor: "#fa755a"
+            }
+        };
+
+        card = elements.create('card', {style: style});
+        card.mount('#card-element');
+
+        card.on('focus', function () {
+            let el = document.getElementById('card-errors');
+            el.classList.add('focused');
+        });
+
+        card.on('blur', function () {
+            let el = document.getElementById('card-errors');
+            el.classList.remove('focused');
+        });
+
+        card.on('change', function (event) {
+            displayError(event);
+        });
+
+        // Add save button click event here where card data is accessible
+        let cardSaveForm = document.getElementById("card-save-form");
+
+        if (cardSaveForm) {
+            cardSaveForm.addEventListener('submit', e => {
+                e.preventDefault();
+                // clear errors
+                changeLoadingState(false, "save-card-btn", "#edit-card-modal-label");
+                // Turn on the spinner
+                changeLoadingState(true, "save-card-btn", "#edit-card-modal-label");
+
+                // modify the payment method with the new details
+                modifyPaymentMethod({ card });
+            });
+        }
+    };
+
+    var modifyPaymentMethod = function({ card }) {
+        // There does not seem to be a way to directly modify payment method or
+        // card details using StripeJS. So you have to create a new payment method
+        // in JS, and then call a backend endpoint which will replace the current
+        // subscription's default payment method with the new one. Wow.
+        // Payment methods once created cannot be deleted either.
+        // https://lolpics.com/wp-content/uploads/2020/10/1602304085000.jpg
+        let billingName = "{{ user.get_full_name }}";
+
+        stripe.createPaymentMethod({
+            type: 'card',
+            card: card,
+            billing_details: {
+                name: billingName
+            }
+        }).then((result) => {
+            if (result.error) {
+                displayError(result);
+                changeLoadingState(false, "save-card-btn", "#edit-card-modal-label");
+            } else {
+                const paymentParams = {
+                    payment_method: result.paymentMethod.id
+                };
+
+                fetch("{% url 'payments:modify-payment-method' %}", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFTOKEN': '{{ csrf_token }}'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(paymentParams)
+                }).then((response) => {
+                    return response.json();
+                }).then((result) => {
+                    if (result.error) {
+                        throw result;
+                    }
+                    return result;
+                }).then((result) => {
+                    if (result && result.payment_method_id) {
+                        window.location.reload();
+                    }
+                    changeLoadingState(false, "save-card-btn", "#edit-card-modal-label");
+                }).catch((error) => {
+                    displayError(error);
+                    changeLoadingState(false, "save-card-btn", "#edit-card-modal-label");
+                });
+            }
+        })
+    };
+
+    let bootstrap_alert = function() {}
+    bootstrap_alert.warning = function(message) {
+        document.getElementById('alert-placeholder').innerHTML = '<div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert" aria-label="Close">&times;</button><span>'+message+'</span></div>';
+    };
+
+    document.getElementById("cancel-sub-btn").addEventListener("click", e => {
+        changeLoadingState(true, "cancel-sub-btn", "#sub-cancel-modal-label");
+
+        fetch("{% url 'users:cancel-subscription' %}", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFTOKEN': '{{ csrf_token }}'
+            },
+            credentials: 'same-origin'
+        }).then((response) => {
+            return response.json();
+        }).then((result) => {
+            if (result.error) {
+                throw result;
+            }
+
+            return result;
+        }).then((result) => {
+            if (result && result.deleted_sub_id) {
+                window.location = result.next_url;
+            }
+            changeLoadingState(false, "cancel-sub-btn", "#sub-cancel-modal-label");
+        }).catch((event) => {
+            changeLoadingState(false, "cancel-sub-btn", "#sub-cancel-modal-label");
+            bootstrap_alert.warning(event.error.message);
+        });
+    });
+
+    document.getElementById("edit-card").addEventListener("click", e => {
+        stripeElements();
+    });
+</script>
+{% endblock inline_javascript %}

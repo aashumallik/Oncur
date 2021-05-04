@@ -1,0 +1,318 @@
+{% load static i18n %}<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{% block title %}medico{% endblock title %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Medical appointments website">
+    <meta name="author" content="Pritish C">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}">
+
+    {% block css %}
+    
+    <!-- Latest compiled and minified Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    
+
+    <!-- Your stuff: Third-party CSS libraries go here -->
+
+    <!-- animate CSS -->
+    <link rel="stylesheet" href="{% static 'medico-theme/css/animate.css' %}">
+    <!-- owl carousel CSS -->
+    <link rel="stylesheet" href="{% static 'medico-theme/css/owl.carousel.min.css' %}">
+    <!-- themify CSS -->
+    <link rel="stylesheet" href="{% static 'medico-theme/css/themify-icons.css' %}">
+    <!-- flaticon CSS -->
+    <link rel="stylesheet" href={% static 'medico-theme/css/flaticon.css' %}>
+    <!-- magnific popup CSS -->
+    <link rel="stylesheet" href="{% static 'medico-theme/css/magnific-popup.css' %}">
+    <!-- nice select CSS -->
+    <link rel="stylesheet" href="{% static 'medico-theme/css/nice-select.css' %}">
+    <!-- swiper CSS -->
+    <link rel="stylesheet" href="{% static 'medico-theme/css/slick.css' %}">
+    <!-- style CSS -->
+    <link rel="stylesheet" href="{% static 'medico-theme/css/style.css' %}">
+    
+    <!-- This file stores project-specific CSS -->
+    
+    <link href="{% static 'css/project.css' %}" rel="stylesheet">
+    
+    
+    {% endblock %}
+    <!-- Le javascript
+    ================================================== -->
+    {# Placed at the top of the document so pages load faster with defer #}
+    {% block javascript %}
+      
+      <!-- Bootstrap JS and its dependencies-->
+      <script defer src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+      <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+      <script defer src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+      <!-- Your stuff: Third-party javascript libraries go here -->
+      
+
+      <!-- place project specific Javascript in this file -->
+      
+      <script defer src="{% static 'js/project.js' %}"></script>
+      
+
+    {% endblock javascript %}
+
+  </head>
+
+  <body>
+
+  {% block header %}
+
+    <header class="main_menu home_menu">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-12">
+                    <nav class="navbar navbar-expand-lg navbar-light">
+                        <a class="navbar-brand" href="index.html"> <img src="{% static 'medico-theme/img/logo.png' %}" alt="logo"> </a>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse"
+                            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                            aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+
+                        <div class="collapse navbar-collapse main-menu-item justify-content-center"
+                            id="navbarSupportedContent">
+                            <ul class="navbar-nav align-items-center">
+                                <li class="nav-item active">
+                                    <a class="nav-link" href="{% url 'home' %}">Home</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'about' %}">about</a>
+                                </li>
+
+                                {% if request.user.is_authenticated %}
+                                    <li class="nav-item">
+                                        {# URL provided by django-allauth/account/urls.py #}
+                                        <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        {# URL provided by django-allauth/account/urls.py #}
+                                        <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="nav-item">
+                                        {# URL provided by django-allauth/account/urls.py #}
+                                        <a id="sign-up-link" class="nav-link" href="{% url 'users:customer-signup' %}">{% trans "Sign Up" %}</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        {# URL provided by django-allauth/account/urls.py #}
+                                        <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
+                                    </li>
+                                {% endif %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="Doctor.html">Doctors</a>
+                                </li>
+
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="blog.html" id="navbarDropdown"
+                                        role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Pages
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item" href="services.html">services</a>
+                                        <a class="dropdown-item" href="dep.html">depertments</a>
+                                        <a class="dropdown-item" href="elements.html">Elements</a>
+                                    </div>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="blog.html" id="navbarDropdown_1"
+                                        role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        blog
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown_1">
+                                        <a class="dropdown-item" href="blog.html">blog</a>
+                                        <a class="dropdown-item" href="single-blog.html">Single blog</a>
+                                    </div>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" href="contact.html">Contact</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <a class="btn_2 d-none d-lg-block" href="#">HOT LINE- 09856</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {% comment %}
+        XXX: Commented out the below code, delete later.
+        <div class="mb-1">
+          <nav class="navbar navbar-expand-md navbar-light bg-light">
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'home' %}">medico</a>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'about' %}">About</a>
+                </li>
+                {% if request.user.is_authenticated %}
+                  <li class="nav-item">
+                    {# URL provided by django-allauth/account/urls.py #}
+                    <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
+                  </li>
+                  <li class="nav-item">
+                    {# URL provided by django-allauth/account/urls.py #}
+                    <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
+                  </li>
+                {% else %}
+                  <li class="nav-item">
+                    {# URL provided by django-allauth/account/urls.py #}
+                    <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% trans "Sign Up" %}</a>
+                  </li>
+                  <li class="nav-item">
+                    {# URL provided by django-allauth/account/urls.py #}
+                    <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% trans "Sign In" %}</a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
+          </nav>
+
+        </div>
+    {% endcomment %}
+
+    {% endblock header %}
+
+    <div class="container alert-container">
+
+      {% if messages %}
+          {% for message in messages %}
+              <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+          {% endfor %}
+      {% endif %}
+
+      {% comment %}One alert div below for Javascript alerts as well{% endcomment %}
+      <div id="alert-placeholder"></div>
+
+    </div> <!-- /container -->
+
+    <div class="container padding_top padding_bottom">
+        {% block content %}
+            <p>Use this document as a way to quick start any new project.</p>
+        {% endblock content %}
+    </div>
+
+    {% block modal %}{% endblock modal %}
+
+    {% block footer %}
+        <!-- footer part start-->
+        <footer class="footer-area">
+            <div class="footer section_padding">
+                <div class="container">
+                    <div class="row justify-content-between">
+                        <div class="col-xl-2 col-md-4 col-sm-6 single-footer-widget">
+                            <a href="#" class="footer_logo"> <img src="{% static 'medico-theme/img/logo.png' %}" alt="#"> </a>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor </p>
+                            <div class="social_logo">
+                                <a href="#"><i class="ti-facebook"></i></a>
+                                <a href="#"> <i class="ti-twitter"></i> </a>
+                                <a href="#"><i class="ti-instagram"></i></a>
+                                <a href="#"><i class="ti-skype"></i></a>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-sm-6 col-md-4 single-footer-widget">
+                            <h4>Quick Links</h4>
+                            <ul>
+                                <li><a href="#">About us</a></li>
+                                <li><a href="#">Department</a></li>
+                                <li><a href="#"> Online payment</a></li>
+                                <li><a href="#">Careers</a></li>
+                                <li><a href="#">Department</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-xl-2 col-sm-6 col-md-4 single-footer-widget">
+                            <h4>Explore</h4>
+                            <ul>
+                                <li><a href="#">In the community</a></li>
+                                <li><a href="#">IU health foundation</a></li>
+                                <li><a href="#">Family support </a></li>
+                                <li><a href="#">Business solution</a></li>
+                                <li><a href="#">Community clinic</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-xl-2 col-sm-6 col-md-6 single-footer-widget">
+                            <h4>Resources</h4>
+                            <ul>
+                                <li><a href="#">Lights were season</a></li>
+                                <li><a href="#"> Their is let wherein</a></li>
+                                <li><a href="#">which given over</a></li>
+                                <li><a href="#">Without given She</a></li>
+                                <li><a href="#">Isn two signs think</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-xl-3 col-sm-6 col-md-6 single-footer-widget">
+                            <h4>Newsletter</h4>
+                            <p>Seed good winged wherein which night multiply
+                                midst does not fruitful</p>
+                            <div class="form-wrap" id="mc_embed_signup">
+                                <form target="_blank"
+                                    action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
+                                    method="get" class="form-inline">
+                                    <input class="form-control" name="EMAIL" placeholder="Your Email Address"
+                                        onfocus="this.placeholder = ''" onblur="this.placeholder = 'Your Email Address '"
+                                        required="" type="email">
+                                    <button class="click-btn btn btn-default text-uppercase"> <i class="ti-angle-right"></i>
+                                    </button>
+                                    <div style="position: absolute; left: -5000px;">
+                                        <input name="b_36c4fd991d266f23781ded980_aefe40901a" tabindex="-1" value=""
+                                            type="text">
+                                    </div>
+
+                                    <div class="info"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="copyright_part">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <p class="footer-text m-0 col-lg-8 col-md-12"><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+    Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="ti-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+    </p>
+                        <div class="col-lg-4 col-md-12 text-center text-lg-right footer-social">
+                            <a href="#"><i class="ti-facebook"></i></a>
+                            <a href="#"> <i class="ti-twitter"></i> </a>
+                            <a href="#"><i class="ti-instagram"></i></a>
+                            <a href="#"><i class="ti-skype"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- footer part end-->
+    {% endblock footer %}
+
+    {% block inline_javascript %}
+    {# Script tags with only code, no src (defer by default) #}
+    {% endblock inline_javascript %}
+  </body>
+</html>
+ 

@@ -1,0 +1,34 @@
+{% extends "account/signup.html" %}
+
+{% block signup_links %}
+    {{ block.super }}
+    <p>Want telehealth consultations? Head to <a href="{% url 'users:customer-signup' %}">customer registration</a>.</p>
+{% endblock signup_links %}
+
+{% block form_action %}{% url 'users:medical-signup' %}{% endblock form_action %}
+
+{% block inline_javascript %}
+    <script type="text/javascript">
+        // XXX: Hardcoding of field name, fix somehow
+        let staff_select = document.getElementById("id_staff_type"),
+            doctor_specialty = document.getElementById("div_id_doctor_specialty"),
+            other_specialty = document.getElementById("div_id_other_specialty"),
+            DOCTOR = "0";
+
+        let adjustSpecialtyVisibility = function() {
+            if (staff_select.value === DOCTOR) {
+                doctor_specialty.classList.remove("hidden");
+                other_specialty.classList.add("hidden");
+            } else {
+                doctor_specialty.classList.add("hidden");
+                other_specialty.classList.remove("hidden");
+            }
+        };
+
+        staff_select.addEventListener("change", e => {
+            adjustSpecialtyVisibility();
+        });
+
+        adjustSpecialtyVisibility();
+    </script>
+{% endblock inline_javascript %}

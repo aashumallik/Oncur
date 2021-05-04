@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}User: {{ object.username }}{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="row">
+    <div class="col-sm-12">
+
+    {% if object == request.user %}
+        <h2>{{ object.username }}</h2>
+        <h5>{{ request.profile.name_with_title }}</h5>
+        {% if request.profile_type == 'medical_pro' %}
+            {% if request.profile.is_verified %}
+                <p>Your medical profile has been verified and you may seek users on the platform.</p>
+            {% else %}
+                <p>We are currently evaluating your medical profile.</p>
+                <p>Check this space and your email for updates in the near future.</p>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+    </div>
+  </div>
+
+{% if object == request.user %}
+<!-- Action buttons -->
+<div class="row">
+
+  <div class="col-sm-12">
+    <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">My Info</a>
+    <a class="btn btn-primary" href="{% url 'account_email' %}" role="button">E-Mail</a>
+    <!-- Your Stuff: Custom user template urls -->
+    {% if request.profile_type == 'customer' %}
+        <a class="btn btn-primary" href="{% url 'users:subscription' %}" role="button">Manage Subscription</a>
+    {% endif %}
+  </div>
+
+</div>
+<!-- End Action buttons -->
+{% endif %}
+
+
+</div>
+{% endblock content %}
+
