@@ -100,6 +100,8 @@ Deployment
 
 The following details how to deploy this application.
 
+Deployed temporarily on Heroku
 
+https://oncur.io/
 
 
